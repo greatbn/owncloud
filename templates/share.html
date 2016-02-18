@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="panel panel-default">
+  <div class="panel-heading">Share with user</div>
+  <div class="panel-body">
+   <form class="form-horizontal" role="form" method="POST" action="/share/{{ file_name[1:] }}">
+  	<div class="form-group">
+  	  {% if error != None %}
+      <div class="alert alert-warning" role="alert"> {{ error }}</div>
+      {% endif %}
+      <div class="col-sm-10">          
+        <input type="text"  name="user" class="form-control" placeholder="Enter user or groups ">
+      </div>
+   
+    </div>
+    <div class="checkbox">
+ 		 <label><input name="share_with" type="checkbox" value="user" >User</label>
+	</div>
+	<div class="checkbox">
+  		<label><input name = "share_with" type="checkbox" value="group" >Group</label>
+	</div>
+    <div class="form-group">        
+      <div class="col-sm-offset-2 col-sm-10">
+        <button type="submit" class="btn btn-default">Share</button>
+      </div>
+    </div>
+   </form>
+   <h4>List user, group are Shared </h4>
+   {% if list_share != None %}
+    {% for share in range(list_share|length) %}
+    {% if list_share[share]['share_type'] == '0' %}   	
+    	<li><div> {{ list_share[share]['share_with'] }}</div></li>       
+    <!-- <form method="POST" action="/share/{{ file_name[1:] }}/change_permission"> -->
+      {% if list_share[share]['permissions'][3] == '1' %}
+            <input type="checkbox" id="Change{{ list_share[share]['share_with'] }}"  checked="checked">Change
+      {% else %}
+        <input type="checkbox" id="Change{{ list_share[share]['share_with'] }}" >Change
+      {% endif %}
+
+       {% if list_share[share]['permissions'][2] == '1' %}
+        <input type="checkbox" id="Create{{ list_share[share]['share_with'] }}"  checked="checked">Create
+      {% else %}
+          <input type="checkbox" id="Create{{ list_share[share]['share_with'] }}" >Create
+      {% endif %}  
+
+       {% if list_share[share]['permissions'][1] == '1' %}
+          <input type="checkbox" id="Delete{{ list_share[share]['share_with'] }}"  checked="checked">Delete
+      {% else %}
+          <input type="checkbox" id="Delete{{ list_share[share]['share_with'] }}" >Delete
+      {% endif %}
+
+       {% if list_share[share]['permissions'][0] == '1' %}
+        <input type="checkbox" id="Share{{ list_share[share]['share_with'] }}"  checked="checked">Share
+      {% else %}
+      <input type="checkbox" id="Share{{ list_share[share]['share_with'] }}" >Share
+      {% endif %}
+        <button type="submit"  class="btn btn-default" onclick="science('user','{{ list_share[share]['share_with'] }}','{{ list_share[share]['id'] }}')">Apply</button>
+
+    <!-- </form> -->
+     <br>
+    {% elif list_share[share]['share_type'] == '1' %}	
+    	<li><div> {{ list_share[share]['share_with'] }} (group) </div></li>       
+    <!-- <form method="POST" action="/share/{{ file_name[1:] }}/change_permission"> -->
+      {% if list_share[share]['permissions'][3] == '1' %}
+            <input type="checkbox" id="Change{{ list_share[share]['share_with'] }}"  checked="checked">Change
+      {% else %}
+        <input type="checkbox" id="Change{{ list_share[share]['share_with'] }}" >Change
+      {% endif %}
+
+       {% if list_share[share]['permissions'][2] == '1' %}
+        <input type="checkbox" id="Create{{ list_share[share]['share_with'] }}"  checked="checked">Create
+      {% else %}
+          <input type="checkbox" id="Create{{ list_share[share]['share_with'] }}" >Create
+      {% endif %}  
+
+       {% if list_share[share]['permissions'][1] == '1' %}
+          <input type="checkbox" id="Delete{{ list_share[share]['share_with'] }}"  checked="checked">Delete
+      {% else %}
+          <input type="checkbox" id="Delete{{ list_share[share]['share_with'] }}" >Delete
+      {% endif %}
+
+       {% if list_share[share]['permissions'][0] == '1' %}
+       
+        <input type="checkbox" id="Share{{ list_share[share]['share_with'] }}"  checked="checked">Share
+      {% else %}
+      <input type="checkbox" id="Share{{ list_share[share]['share_with'] }}"  >Share
+      {% endif %}
+      
+       <button type="submit" class="btn btn-default" onclick="science('group','{{ list_share[share]['share_with'] }}','{{ list_share[share]['id'] }}')">Apply</button>
+      
+    <!-- </form> -->
+      <br>
+    {% endif %}
+    {% endfor %}
+   {% endif %}
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading">Share Link </div>
+  <div class="panel-body">
+{% set share_link = {'Share' : False } %}
+
+   {% if list_share != None %}
+    {% for share in range(list_share|length) %}
+      {% if list_share[share]['share_type'] == '3' %}
+    
+    {% set _ = share_link.update({'Share' : True }) %}
+
+    <div> <a href="{{ list_share[share]['url'] }}"> {{ list_share[share]['url'] }}</a></div>
+    <a href = "/share/{{ file_name[1:] }}?share=dellink&id={{ list_share[share]['id'] }}" class = "btn btn-success" role = "button"> Delete Link</a>
+
+    
+     {% endif %}
+
+    {% endfor %}
+
+    {% endif %} 
+    {% if share_link['Share'] == False %}
+    
+    <a href = "/share/{{ file_name[1:] }}?share=link" class = "btn btn-success" role = "button"> Get Link</a>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+  function science(share_type,name,share_id_value)
+  {
+    var xmlhttp = new XMLHttpRequest();
+    var Change = document.getElementById("Change"+name), // Checkbox 1
+      Create = document.getElementById("Create"+name), // Checkbox 2
+      Delete = document.getElementById("Delete"+name), // Checkbox 3
+      Share = document.getElementById("Share"+name)
+      
+      permissions = 0; 
+      changeperms = '0';
+      createperms = '0';
+      deleteperms = '0';
+      shareperms = '0';
+    if (Change.checked)
+        
+         changeperms = '1';
+
+    if (Create.checked)
+        
+          createperms  = '1';
+
+    if (Delete.checked)
+          deleteperms = '1';
+    if (Share.checked) 
+      shareperms = '1';
+
+    permissions_value = shareperms + deleteperms + createperms + changeperms + '1';
+
+    xmlhttp.open("POST", "/share/changepermission");
+    xmlhttp.setRequestHeader("Content-Type", "application/json");
+    if (share_type == 'user' )
+      xmlhttp.send(JSON.stringify({share_id:share_id_value ,user:name, permissions:permissions_value,file_name: '{{ file_name }}' }));
+    if (share_type == 'group' )
+      xmlhttp.send(JSON.stringify({share_id:share_id_value ,group:name, permissions:permissions_value,file_name: '{{ file_name }}' }));
+
+    
+  }
+</script>
+{% endblock %}

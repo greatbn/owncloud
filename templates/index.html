@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+
+<a href = "/file?path=%2F" class = "btn btn-default" role = "button">
+  <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+</a>
+
+<br>
+
+          <!-- Single button -->
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <!--     Action <span class="caret"></span> -->
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                  <form id='form' action="/new/upload" method=post >
+                   <input type="file" name="file" onchange="javascript:document.getElementById('form').submit();"/>                   
+                  </form>
+
+                   <!-- <input type="file" id="fileUpload" onchange=" javascript:document.getElementById('form').action= '/new/upload/document.getElementById('fileUpload').value' "> -->
+                    <!-- <input type="button" "> -->
+              </li>
+              <li><a href="/new/newfolder">New Folder</a></li>
+               <li><a href="/new/newfile">New Text File</a></li>
+            </ul>
+          </div>
+
+<div class="container">   
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Size</th>
+        <th></th>
+        <th></th>
+        <th>Last Modified</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for file in range(List|length) %}
+    
+    <tr> 
+      <td>
+          <a href="/file?path={{ List[file]['path'] }}">
+        {{ List[file]['name'] }}
+        </a>
+      </td>
+      <td>
+         {{ List[file]['size']|filesizeformat }}
+      </td>
+      <td>
+         <a href = "/share/{{ List[file]['path'][1:] }}" class = "btn btn-success" role = "button"> Share info</a>
+       </td>         
+       <td>
+             <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#myModal">Rename</button>
+
+              <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog modal-sm">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Rename</h4>
+                    </div>
+                    
+                      <form role="form" method = "POST" action="/action?action=rename&file={{ List[file]['path'] }}&path={{List[file]['parent-dir']}}" >
+                        <div class="form-group" >
+                          <label for="email">New Name</label>
+                          <input type="text" class="form-control" id="text" name="newname">
+                        </div>                   
+                        <button type="submit" class="btn btn-default">Submit</button>
+                      </form>
+                  </div>
+                </div>
+              </div>
+         
+           </td>
+      <td>
+          <!-- Single button -->
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Action <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="/action?action=download&file={{ List[file]['path'] }}&path={{List[file]['parent-dir']}}">Download</a></li>
+              <li><a href="/action?action=delete&file={{ List[file]['path'] }}&path={{List[file]['parent-dir']}}">Delete</a></li>
+            </ul>
+          </div>
+      </td>
+      <td> {{ List[file]['last-modified'] }}</td>   
+      {% if List[file]['shared'] == True %}
+      <td> <a href="/share/{{ List[file]['path'] }}"> </a> Shared</td>
+      {% endif %}
+    </tr>
+    
+      {% endfor %}
+    </tbody>
+  </table>
+ 
+</div>
+
+
+{% endblock %} 

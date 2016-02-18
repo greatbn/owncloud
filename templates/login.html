@@ -1,0 +1,26 @@
+{% extends "bootstrap/base.html" %}
+{% block content %}
+{% if error != None %}
+  <div class="alert alert-danger" role="alert">
+    {{ error }}
+  </div>
+{% endif %}
+<div id="loginModal" class="modal show" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-body">
+          <form class="form col-md-12 center-block" method="POST">
+            <div class="form-group">
+              <input name="username" type="text" class="form-control input-lg" placeholder="Email">
+            </div>
+            <div class="form-group">
+              <input name="password" type="password" class="form-control input-lg" placeholder="Password">
+            </div>
+            <div class="form-group">
+              <button class="btn btn-primary btn-lg btn-block">Sign In</button>
+          <!--     <span class="pull-right"><a href="#">Register</a></span><span><a href="#">Need help?</a></span> -->
+            </div>
+          </form>
+      </div>
+  </div>
+</div>
+{% endblock %}
